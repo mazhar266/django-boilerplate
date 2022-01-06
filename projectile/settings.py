@@ -80,10 +80,11 @@ DJANGO_APPS = [
 # other third-party apps
 THIRDPARTY_APPS = [
     "rest_framework",
+    "djoser",
     "sorl.thumbnail",
 ]
 
-INSTALLED_APPS = PROJECT_APPS + DJANGO_APPS + THIRDPARTY_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRDPARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -140,6 +141,30 @@ if 'test' in sys.argv:
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',
     }
+
+# REDIS CACHE
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://{}:{}/1".format(
+            os.environ.get('REDIS_HOST', "127.0.0.1"),
+            os.environ.get('REDIS_PORT', "6379")
+        ),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# REDIS SESSIONS
+SESSION_REDIS = {
+    'host': os.environ.get('REDIS_HOST', "127.0.0.1"),
+    'port': os.environ.get('REDIS_PORT', "6379"),
+    'db': 0,
+    'prefix': 'session',
+    'socket_timeout': 1,
+    'retry_on_timeout': False
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -239,7 +264,6 @@ SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('Bearer', ),
 }
 
-
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -285,16 +309,6 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'common': {
-            'handlers': ['console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'search': {
-            'handlers': ['console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'django_crontab.crontab': {
             'handlers': ['console'],
             'propagate': True,
             'level': 'DEBUG',

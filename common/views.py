@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from django.http import JsonResponse
 
-# Create your views here.
+
+def app_info(request):
+    response = {
+        'name': 'Projectile',
+        'info': 'A simple REST API Project',
+        'version': '0.0.3',
+    }
+    return JsonResponse(response)

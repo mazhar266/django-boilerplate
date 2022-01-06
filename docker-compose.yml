@@ -1,0 +1,44 @@
+# Author: Mazhar Ahmed, CTO, Cybridge Bangladesh
+# All rights reserved. Copyright (c) Mazhar Ahmed
+version: '3'
+services:
+  postgres:
+    container_name: postgres
+    # let's grab from postgres 10 image
+    image: postgres:10-alpine
+    volumes:
+        # pass volume named pgdata to postgresql container
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      # credentials
+      POSTGRES_USER: postgres
+      POSTGRES_DB: project
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - projectile
+
+  redis:
+    container_name: redis
+    # official redis based on alpine linux (it's faster and small)
+    image: redis:5.0.5-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - projectile
+  
+# volumes definition here
+volumes:
+  # just a persistance data
+  pgdata:
+    driver: local
+
+# network definition here
+networks:
+  # just a bridge network
+  projectile:
+    name: projectile
+    driver: bridge
